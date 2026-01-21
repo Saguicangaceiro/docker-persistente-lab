@@ -14,7 +14,7 @@ services:
     networks:
       - backend_net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d clientes_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-clientes_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,26 +22,48 @@ services:
   web:
     build: .
     container_name: flask_app
-    ports:
-      - "5000:5000"
+    restart: unless-stopped
     environment:
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD:-senha123}@db:5432/${DB_NAME:-clientes_db}
     depends_on:
       db:
         condition: service_healthy
     networks:
+      - frontend_net
       - backend_net
-    # Boas práticas de DevOps: limitar recursos de CPU/Memória
     deploy:
       resources:
         limits:
           cpus: '0.50'
           memory: 256M
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+    networks:
+      - frontend_net
+
+  adminer:
+    image: adminer
+    container_name: adminer_panel
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - backend_net
+
 networks:
+  frontend_net:
+    driver: bridge
   backend_net:
     driver: bridge
 
 volumes:
   dados_do_banco:
-    name: volume_persistente_producao
+    name: volume_producao_clientes

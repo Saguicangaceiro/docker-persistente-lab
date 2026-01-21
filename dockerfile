@@ -1,9 +1,9 @@
 FROM python:3.11-alpine
 
-# Dependências do sistema
-RUN apk add --no-cache gcc musl-dev postgresql-dev
+# Instalar dependências para o Postgres e ferramentas de diagnóstico
+RUN apk add --no-cache gcc musl-dev postgresql-dev postgresql-client
 
-# Criar usuário não-root para segurança (Prática DevOps)
+# Criar utilizador de sistema para não rodar como root (Segurança DevOps)
 RUN adduser -D devopsuser
 WORKDIR /home/devopsuser/app
 
@@ -12,11 +12,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Mudar permissões para o usuário criado
+# Ajustar permissões
 RUN chown -R devopsuser:devopsuser /home/devopsuser/app
 USER devopsuser
 
-# Expor a porta que a aplicação utiliza
 EXPOSE 5000
 
-CMD ["python", "app.py"]
+# Usando Gunicorn: 4 workers para lidar com requisições concorrentes
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--workers", "4", "--threads", "2"]
