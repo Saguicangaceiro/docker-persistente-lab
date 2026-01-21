@@ -2,31 +2,77 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Clientes - Teste DevOps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Lab | Registro de Clientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@180.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; margin: 40px; background-color: #f4f4f4; }
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        form { margin-bottom: 20px; }
-        input { padding: 8px; margin-right: 10px; }
-        button { padding: 8px 15px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 4px; }
-        li { margin-bottom: 5px; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border: none; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); }
+        .header-bg { background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: white; padding: 2rem 0; margin-bottom: 2rem; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Cadastro de Clientes</h1>
-        <form method="POST">
-            <input type="text" name="nome" placeholder="Nome do Cliente" required>
-            <input type="password" name="senha" placeholder="Senha" required>
-            <button type="submit">Cadastrar</button>
-        </form>
 
-        <h2>Clientes Registrados no Banco:</h2>
-        <ul>
-            {% for usuario in usuarios %}
-                <li><strong>ID:</strong> {{ usuario.id }} | <strong>Nome:</strong> {{ usuario.nome }}</li>
-            {% endfor %}
-        </ul>
+<div class="header-bg shadow-sm">
+    <div class="container">
+        <h1 class="display-5 fw-bold">🚀 DevOps Lab</h1>
+        <p class="lead">Sistema de Cadastro Persistente com Docker & Postgres</p>
     </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card p-4">
+                <h4 class="mb-3">Novo Cliente</h4>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nome Completo</label>
+                        <input type="text" name="nome" class="form-control" placeholder="Ex: Antônio Marcos" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha de Acesso</label>
+                        <input type="password" name="senha" class="form-control" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Cadastrar Cliente</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card p-4">
+                <h4 class="mb-3">Clientes no Banco de Dados</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome do Cliente</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios %}
+                            <tr>
+                                <td><span class="badge bg-secondary">#{{ usuario.id }}</span></td>
+                                <td class="fw-bold">{{ usuario.nome }}</td>
+                                <td><span class="text-success">● Ativo</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if not usuarios %}
+                    <div class="alert alert-info text-center">Nenhum cliente registrado no momento.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center mt-5 py-3 text-muted">
+    <small>Ambiente Lab | Docker • Nginx • Gunicorn • Postgres</small>
+</footer>
+
 </body>
 </html>

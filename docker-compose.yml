@@ -14,8 +14,8 @@ services:
     networks:
       - backend_net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-clientes_db}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U admin -d clientes_db"]
+      interval: 5s
       timeout: 5s
       retries: 5
 
@@ -31,11 +31,6 @@ services:
     networks:
       - frontend_net
       - backend_net
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
 
   nginx:
     image: nginx:alpine
@@ -52,7 +47,6 @@ services:
   adminer:
     image: adminer
     container_name: adminer_panel
-    restart: always
     ports:
       - "8080:8080"
     networks:
@@ -60,10 +54,8 @@ services:
 
 networks:
   frontend_net:
-    driver: bridge
   backend_net:
-    driver: bridge
 
 volumes:
   dados_do_banco:
-    name: volume_producao_clientes
+    name: vol_lab_persistente

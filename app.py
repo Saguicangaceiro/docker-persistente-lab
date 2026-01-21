@@ -4,8 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# O DevOps injeta esta variável via Docker Compose
-# Caso não exista, usa o padrão local para desenvolvimento
+# Configuração via Variável de Ambiente (Prática DevOps)
 db_url = os.getenv("DATABASE_URL", "postgresql://admin:senha123@db:5432/clientes_db")
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -17,6 +16,7 @@ class Usuario(db.Model):
     nome = db.Column(db.String(80), nullable=False)
     senha = db.Column(db.String(80), nullable=False)
 
+# Garantir criação das tabelas
 with app.app_context():
     db.create_all()
 
@@ -32,5 +32,5 @@ def index():
     return render_template('index.html', usuarios=usuarios)
 
 if __name__ == '__main__':
-    # Em produção, o Gunicorn ignora este bloco e usa a sua própria configuração
+    # O Gunicorn usará o objeto 'app' no docker-compose
     app.run(host='0.0.0.0', port=5000)
