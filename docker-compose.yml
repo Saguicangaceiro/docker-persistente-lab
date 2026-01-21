@@ -2,24 +2,46 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:alpine
+    image: postgres:15-alpine
     container_name: postgres_db
+    restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: senha123
-      POSTGRES_DB: clientes_db
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-senha123}
+      POSTGRES_DB: ${DB_NAME:-clientes_db}
     volumes:
-      - dados_do_banco:/var/lib/postgresql/data # PERSISTÊNCIA AQUI
-    ports:
-      - "5432:5432"
+      - dados_do_banco:/var/lib/postgresql/data
+    networks:
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d clientes_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   web:
     build: .
     container_name: flask_app
     ports:
       - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD:-senha123}@db:5432/${DB_NAME:-clientes_db}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - backend_net
+    # Boas práticas de DevOps: limitar recursos de CPU/Memória
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+networks:
+  backend_net:
+    driver: bridge
 
 volumes:
-  dados_do_banco: # Volume nomeado gerenciado pelo Docker
+  dados_do_banco:
+    name: volume_persistente_producao

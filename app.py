@@ -1,16 +1,16 @@
+import os
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-import os
 
 app = Flask(__name__)
 
-# Configuração da conexão com o Postgres
-db_url = "postgresql://admin:senha123@db:5432/clientes_db"
+# O DevOps injeta essa variável via Docker Compose ou Kubernetes
+db_url = os.getenv("DATABASE_URL", "postgresql://admin:senha123@db:5432/clientes_db")
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
+# ... restante do código permanece igual
 # Modelo do Banco de Dados
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
