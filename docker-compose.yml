@@ -45,8 +45,13 @@ services:
       - frontend_net
 
   adminer:
-    image: adminer
+    # Trocamos a imagem oficial pela versão customizada
+    image: p76codat/adminer-custom
     container_name: adminer_panel
+    restart: always
+    environment:
+      # Definimos o tema aqui. Você pode trocar para 'material' ou 'flat' se preferir
+      - ADMINER_DESIGN=dracula 
     ports:
       - "8080:8080"
     networks:
